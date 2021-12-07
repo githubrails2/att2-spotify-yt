@@ -18,32 +18,32 @@ const colors = [
   "from-purple-500",
 ];
 const Center = () => {
-  const { data: session } = useSession();
-  const spotifyApi = useSpotify();
+  const { data: session,status } = useSession();
+  
   const [color, setColor] = useState(null);
-  const [playlistId] = useRecoilValue(playlistIdState);
+  const playlistId = useRecoilValue(playlistIdState);
   const [playlist, setPlaylist] = useRecoilState(playlistState)
-
+  const spotifyApi = useSpotify();
+  
   useEffect(() => {
     setColor(shuffle(colors).pop());
   }, [playlistId]);
   
   useEffect(() => {
-    
+    if (spotifyApi.getAccessToken()) {
       spotifyApi.getPlaylist(playlistId).then(data => {
         setPlaylist(data.body);
       })
         .catch(error => {
           console.log("Something went wrong!", error);
-        })   
-  
-    
-    
+        })
+    }
+        
  
-  }, [spotifyApi,playlistId]);
-  console.log("Playlist contents",playlist);
+  }, [session,spotifyApi,playlistId]);
+  
   return (
-    <div className="flex-grow">
+    <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide">
       <header className="absolute top-5 right-8">
         <div className="flex items-center text-white bg-black space-x-2 opacity-90 hover:opacity-80 rounded-full cursor-pointer p-1 pr-2">
           <img src={session?.user.image} className="rounded-full w-10 h-10" />
