@@ -1,4 +1,4 @@
-import "tailwindcss/tailwind.css";
+import '../styles/globals.css'
 
 import { RecoilRoot } from "recoil";
 import { SessionProvider } from "next-auth/react";
