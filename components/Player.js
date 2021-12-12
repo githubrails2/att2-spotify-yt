@@ -10,6 +10,7 @@ import {
 import { currentTrackIdState, isPlayingState } from "../atoms/songAtom";
 import { useCallback, useEffect, useState } from "react";
 
+import Image from 'next/image';
 import { debounce } from "lodash";
 import { useRecoilState } from "recoil";
 import { useSession } from "next-auth/react";
@@ -64,12 +65,12 @@ const Player = () => {
         if (volume > 0 && volume < 100) {
             debounceAdjustVolume(volume);
             }    
-    }, [volume])
+    }, [debounceAdjustVolume,volume])
     
 	return (
 		<div className="h-24 bg-gradient-to-b from-black to-gray-900 text-white grid grid-cols-3 text-xs md:text-base px-2 md:px-8">
 			<div className="space-x-4 flex items-center ">
-				<img
+				<Image
 					src={songInfo?.album.images?.[0]?.url}
 					alt=""
 					className="hidden md:inline h-10 w-10"
