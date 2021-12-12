@@ -10,7 +10,6 @@ import {
 import { currentTrackIdState, isPlayingState } from "../atoms/songAtom";
 import { useCallback, useEffect, useState } from "react";
 
-import Image from 'next/image';
 import { debounce } from "lodash";
 import { useRecoilState } from "recoil";
 import { useSession } from "next-auth/react";
@@ -19,16 +18,18 @@ import useSpotify from "../hooks/useSpotify";
 
 const Player = () => {
 	const spotifyApi = useSpotify();
-	const { data: session, status } = useSession();
+	const { data: session} = useSession();
 	const songInfo = useSongInfo();
 	const [currentTrackId, setCurrenTrackId] =
 		useRecoilState(currentTrackIdState);
 	const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
 	const [volume, setVolume] = useState(50);
-    const debounceAdjustVolume = useCallback(
-        debounce((volume) => {
-            spotifyApi.setVolume(volume).catch(error => console.log(error))
-        },500),[])
+	const debounceAdjustVolume = useCallback(
+		() => {
+			debounce((volume) => {
+				spotifyApi.setVolume(volume).catch(error => console.log(error))
+			}, 500)
+		},[spotifyApi])
         
     
     const fetchCurrentSong = () => {
@@ -42,10 +43,8 @@ const Player = () => {
 		}
 	};
 	const handlePlayPause = () => {
-		console.log(spotifyApi.getMyCurrentPlaybackState());
+		
 		spotifyApi.getMyCurrentPlaybackState().then((data) => {
-			console.log(data);
-
 			if (data.body?.is_playing) {
 				spotifyApi.pause();
 				setIsPlaying(false);
@@ -60,6 +59,7 @@ const Player = () => {
 			fetchCurrentSong();
 			setVolume(50);
 		}
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentTrackId, spotifyApi, session]);
     useEffect(() => {
         if (volume > 0 && volume < 100) {
@@ -69,8 +69,10 @@ const Player = () => {
     
 	return (
 		<div className="h-24 bg-gradient-to-b from-black to-gray-900 text-white grid grid-cols-3 text-xs md:text-base px-2 md:px-8">
+			{/**Left */}
 			<div className="space-x-4 flex items-center ">
-				<Image
+				{/*// eslint-disable-next-line @next/next/no-img-element*/}
+				<img
 					src={songInfo?.album.images?.[0]?.url}
 					alt=""
 					className="hidden md:inline h-10 w-10"
@@ -84,14 +86,15 @@ const Player = () => {
 			<div className="flex justify-evenly items-center">
 				<SwitchHorizontalIcon className="button" />
 				<RewindIcon className="button" />
+				{console.log(isPlaying)}
 				{isPlaying ? (
 					<PauseIcon
-						onClick={() => handlePlayPause()}
+						onClick={handlePlayPause}
 						className="button w-10 h-10"
 					/>
 				) : (
 					<PlayIcon
-						onClick={() => handlePlayPause()}
+						onClick={handlePlayPause}
 						className="button w-10 h-10"
 					/>
 				)}
